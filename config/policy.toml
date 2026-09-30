@@ -1,0 +1,37 @@
+# OpsWatch approval policy. Read by src/opswatch/guardrails/policy.py.
+# Principle: the AI may PROPOSE anything allowed here; only a human can APPROVE.
+
+[actions]
+# risk level of each action the agent can propose
+update_ticket   = "medium"
+add_work_note   = "low"
+resolve_ticket  = "high"
+create_change   = "high"
+
+[approval]
+# If true, low-risk proposals (work notes) execute without waiting for a human.
+auto_approve_low_risk = false
+# Humans who may approve. Agents (actor names starting with "agent:") can never approve.
+approvers = ["rutarj", "service-desk-lead", "change-manager"]
+# Only these approvers can approve high-risk actions (resolutions, changes).
+high_risk_approvers = ["service-desk-lead", "change-manager"]
+
+[limits]
+# OWASP LLM10 (unbounded consumption): cap how much a single agent can propose.
+max_proposals_per_agent_per_hour = 60
+max_pending_per_ticket = 3
+max_note_length = 2000
+
+[rules]
+# The agent may never resolve a P1 on its own evidence; it must escalate.
+block_agent_resolve_p1 = true
+# Tickets flagged as possible prompt injection: every proposal becomes high risk.
+escalate_suspicious_tickets = true
+# Security incidents can't be resolved by agent proposal at all.
+block_agent_resolve_categories = ["security"]
+
+# Change freeze windows (UTC). create_change is blocked inside them.
+[[freeze_windows]]
+name  = "year-end-freeze"
+start = "2026-12-15T00:00:00+00:00"
+end   = "2027-01-05T00:00:00+00:00"
