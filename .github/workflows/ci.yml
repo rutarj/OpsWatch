@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      llm_eval:
+        description: "Also run the Claude eval (uses the ANTHROPIC_API_KEY secret, costs a little)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, test, eval gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: pytest --cov=opswatch --cov-report=term-missing --cov-fail-under=85
+      # Fails the build if triage accuracy or injection detection regresses (config/eval_gate.toml).
+      - run: opswatch seed && opswatch train && opswatch eval --triagers rules,ml --gate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: reports/
+
+  llm-eval:
+    name: Claude eval (manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.llm_eval
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: opswatch seed && opswatch eval --triagers rules,llm,hybrid --llm-limit 120
+      - uses: actions/upload-artifact@v4
+        with:
+          name: llm-evaluation-report
+          path: reports/
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t opswatch:ci .
+      - name: Smoke test the container
+        run: |
+          docker run -d --name ow -e OPSWATCH_API_KEY=ci -p 8000:8000 opswatch:ci
+          for i in $(seq 1 20); do curl -sf localhost:8000/health && break; sleep 1; done
+          curl -sf -H "X-API-Key: ci" localhost:8000/api/metrics
