@@ -1,0 +1,122 @@
+[
+  {
+    "id": "KB0001",
+    "title": "Unlock an account and reset a password",
+    "category": "access_identity",
+    "body": "Verify identity with two factors. Unlock in the directory admin console. Force a password reset at next sign-in. Never read a password over the phone."
+  },
+  {
+    "id": "KB0002",
+    "title": "Re-register MFA for a lost or new phone",
+    "category": "access_identity",
+    "body": "Verify identity, revoke old MFA methods, send a temporary access pass, ask the user to enrol the new device."
+  },
+  {
+    "id": "KB0003",
+    "title": "Grant access to a shared drive or application",
+    "category": "access_identity",
+    "body": "Confirm written manager approval. Add the user to the correct security group, never directly to the resource."
+  },
+  {
+    "id": "KB0004",
+    "title": "Docking station and external monitor troubleshooting",
+    "category": "hardware",
+    "body": "Update dock firmware, reseat cables, test a known-good monitor, check display settings, replace dock if needed."
+  },
+  {
+    "id": "KB0005",
+    "title": "Swollen laptop battery: safety procedure",
+    "category": "hardware",
+    "body": "Stop using the device immediately, unplug it, do not charge. Arrange a hardware swap and hazardous disposal."
+  },
+  {
+    "id": "KB0006",
+    "title": "VPN connection troubleshooting",
+    "category": "network",
+    "body": "Check internet connectivity, client version and certificate expiry. Try alternate gateway. Collect client logs."
+  },
+  {
+    "id": "KB0007",
+    "title": "DNS resolution failures for internal sites",
+    "category": "network",
+    "body": "Flush DNS cache, confirm DNS servers via ipconfig, test nslookup against internal resolvers, escalate to NetOps."
+  },
+  {
+    "id": "KB0008",
+    "title": "Application crashes after update",
+    "category": "software",
+    "body": "Clear the local cache, repair the installation, roll back to the previous version if the vendor confirms a bug."
+  },
+  {
+    "id": "KB0009",
+    "title": "Software install and license requests",
+    "category": "software",
+    "body": "Confirm license approval, deploy via the software centre, never install unlicensed software manually."
+  },
+  {
+    "id": "KB0010",
+    "title": "HyFlex room audio: remote students can't hear",
+    "category": "av_classroom",
+    "body": "Check the room PC audio output device, ceiling mic mute status, and the DSP preset. Run the room audio test."
+  },
+  {
+    "id": "KB0011",
+    "title": "Classroom projector or display shows no input",
+    "category": "av_classroom",
+    "body": "Select the correct input on the touch panel, reseat HDMI at the lectern, power-cycle the projector."
+  },
+  {
+    "id": "KB0012",
+    "title": "Outlook not receiving mail",
+    "category": "email_collab",
+    "body": "Check mailbox quota, rules, and connection status. Test in webmail to isolate client vs server."
+  },
+  {
+    "id": "KB0013",
+    "title": "Shared mailbox and distribution list access",
+    "category": "email_collab",
+    "body": "Confirm owner approval, add via the admin centre, allow up to an hour for the mailbox to appear."
+  },
+  {
+    "id": "KB0014",
+    "title": "Suspected phishing: first response",
+    "category": "security",
+    "body": "Do not delete the email. Report it with the phishing button. If credentials were entered, reset the password, revoke sessions and open a security incident. Security incidents are handled by Security Operations only."
+  },
+  {
+    "id": "KB0015",
+    "title": "Lost or stolen device with sensitive data",
+    "category": "security",
+    "body": "Remote-wipe via device management, disable the account's sessions, notify privacy office per policy."
+  },
+  {
+    "id": "KB0016",
+    "title": "Runbook: SQS dead-letter queue not empty",
+    "category": "cloud_ops",
+    "body": "Inspect DLQ messages to find the failure reason. Fix the bug or bad data. Redrive messages to the source queue only after the fix is deployed. Redrive is a change and needs change approval."
+  },
+  {
+    "id": "KB0017",
+    "title": "Runbook: SQS queue backlog growing",
+    "category": "cloud_ops",
+    "body": "Check processor Lambda errors, throttles and concurrency limits. Check downstream DynamoDB throttling."
+  },
+  {
+    "id": "KB0018",
+    "title": "Runbook: Lambda function errors",
+    "category": "cloud_ops",
+    "body": "Open CloudWatch Logs for the function, find the stack trace, check the latest deploy, roll back if needed."
+  },
+  {
+    "id": "KB0019",
+    "title": "Runbook: API Gateway 5xx errors",
+    "category": "cloud_ops",
+    "body": "Check integration Lambda errors and timeouts, recent deploys, and throttling settings. Customer-facing: treat as P1."
+  },
+  {
+    "id": "KB0020",
+    "title": "Runbook: AWS budget alert",
+    "category": "cloud_ops",
+    "body": "Open Cost Explorer filtered by project tag, find the service driving cost, check for runaway loops or load tests."
+  }
+]
