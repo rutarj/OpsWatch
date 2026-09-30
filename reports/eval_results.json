@@ -1,0 +1,424 @@
+{
+  "dataset": {
+    "test_tickets": 240,
+    "note": "synthetic, held-out templates and phrasings"
+  },
+  "triagers": {
+    "rules": {
+      "n": 240,
+      "category_accuracy_pct": 57.1,
+      "category_macro_f1": 0.563,
+      "priority_accuracy_pct": 43.3,
+      "priority_within_one_pct": 74.6,
+      "routing_accuracy_pct": 57.1,
+      "latency_ms": {
+        "p50": 0.03,
+        "p95": 0.06
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "fallbacks": 0,
+      "selective": [
+        {
+          "threshold": 0.3,
+          "coverage_pct": 89.2,
+          "accuracy_pct": 59.8
+        },
+        {
+          "threshold": 0.4,
+          "coverage_pct": 89.2,
+          "accuracy_pct": 59.8
+        },
+        {
+          "threshold": 0.5,
+          "coverage_pct": 89.2,
+          "accuracy_pct": 59.8
+        },
+        {
+          "threshold": 0.6,
+          "coverage_pct": 65.4,
+          "accuracy_pct": 79.0
+        },
+        {
+          "threshold": 0.7,
+          "coverage_pct": 62.1,
+          "accuracy_pct": 79.9
+        },
+        {
+          "threshold": 0.8,
+          "coverage_pct": 60.8,
+          "accuracy_pct": 80.8
+        },
+        {
+          "threshold": 0.9,
+          "coverage_pct": 60.8,
+          "accuracy_pct": 80.8
+        }
+      ],
+      "per_category": {
+        "access_identity": {
+          "precision": 0.326,
+          "recall": 0.933,
+          "f1": 0.483,
+          "support": 30
+        },
+        "hardware": {
+          "precision": 0.595,
+          "recall": 0.733,
+          "f1": 0.657,
+          "support": 30
+        },
+        "network": {
+          "precision": 0.8,
+          "recall": 0.267,
+          "f1": 0.4,
+          "support": 30
+        },
+        "software": {
+          "precision": 0.41,
+          "recall": 0.533,
+          "f1": 0.464,
+          "support": 30
+        },
+        "av_classroom": {
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "support": 30
+        },
+        "email_collab": {
+          "precision": 0.615,
+          "recall": 0.267,
+          "f1": 0.372,
+          "support": 30
+        },
+        "security": {
+          "precision": 1.0,
+          "recall": 0.233,
+          "f1": 0.378,
+          "support": 30
+        },
+        "cloud_ops": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 30
+        }
+      },
+      "confusion": {
+        "labels": [
+          "access_identity",
+          "hardware",
+          "network",
+          "software",
+          "av_classroom",
+          "email_collab",
+          "security",
+          "cloud_ops"
+        ],
+        "matrix": [
+          [
+            28,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            22,
+            0,
+            5,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            12,
+            0,
+            8,
+            10,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            6,
+            8,
+            0,
+            16,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            5,
+            6,
+            1,
+            0,
+            18,
+            0,
+            0,
+            0
+          ],
+          [
+            15,
+            0,
+            1,
+            6,
+            0,
+            8,
+            0,
+            0
+          ],
+          [
+            17,
+            1,
+            0,
+            0,
+            0,
+            5,
+            7,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            30
+          ]
+        ]
+      }
+    },
+    "ml": {
+      "n": 240,
+      "category_accuracy_pct": 57.5,
+      "category_macro_f1": 0.574,
+      "priority_accuracy_pct": 35.8,
+      "priority_within_one_pct": 75.8,
+      "routing_accuracy_pct": 57.5,
+      "latency_ms": {
+        "p50": 3.54,
+        "p95": 5.5
+      },
+      "tokens": {
+        "input": 0,
+        "output": 0
+      },
+      "fallbacks": 0,
+      "selective": [
+        {
+          "threshold": 0.3,
+          "coverage_pct": 64.2,
+          "accuracy_pct": 64.3
+        },
+        {
+          "threshold": 0.4,
+          "coverage_pct": 36.2,
+          "accuracy_pct": 72.4
+        },
+        {
+          "threshold": 0.5,
+          "coverage_pct": 23.3,
+          "accuracy_pct": 78.6
+        },
+        {
+          "threshold": 0.6,
+          "coverage_pct": 12.9,
+          "accuracy_pct": 93.5
+        },
+        {
+          "threshold": 0.7,
+          "coverage_pct": 7.1,
+          "accuracy_pct": 100.0
+        },
+        {
+          "threshold": 0.8,
+          "coverage_pct": 5.0,
+          "accuracy_pct": 100.0
+        },
+        {
+          "threshold": 0.9,
+          "coverage_pct": 0.0,
+          "accuracy_pct": null
+        }
+      ],
+      "per_category": {
+        "access_identity": {
+          "precision": 0.429,
+          "recall": 0.4,
+          "f1": 0.414,
+          "support": 30
+        },
+        "hardware": {
+          "precision": 0.867,
+          "recall": 0.433,
+          "f1": 0.578,
+          "support": 30
+        },
+        "network": {
+          "precision": 0.613,
+          "recall": 0.633,
+          "f1": 0.623,
+          "support": 30
+        },
+        "software": {
+          "precision": 0.333,
+          "recall": 0.7,
+          "f1": 0.452,
+          "support": 30
+        },
+        "av_classroom": {
+          "precision": 0.675,
+          "recall": 0.9,
+          "f1": 0.771,
+          "support": 30
+        },
+        "email_collab": {
+          "precision": 0.4,
+          "recall": 0.2,
+          "f1": 0.267,
+          "support": 30
+        },
+        "security": {
+          "precision": 0.714,
+          "recall": 0.667,
+          "f1": 0.69,
+          "support": 30
+        },
+        "cloud_ops": {
+          "precision": 1.0,
+          "recall": 0.667,
+          "f1": 0.8,
+          "support": 30
+        }
+      },
+      "confusion": {
+        "labels": [
+          "access_identity",
+          "hardware",
+          "network",
+          "software",
+          "av_classroom",
+          "email_collab",
+          "security",
+          "cloud_ops"
+        ],
+        "matrix": [
+          [
+            12,
+            0,
+            0,
+            18,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            13,
+            4,
+            0,
+            13,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            19,
+            9,
+            0,
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            2,
+            0,
+            21,
+            0,
+            7,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            27,
+            0,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            3,
+            5,
+            0,
+            6,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            2,
+            0,
+            0,
+            0,
+            20,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            20
+          ]
+        ]
+      }
+    },
+    "llm": {
+      "skipped": "ANTHROPIC_API_KEY not set"
+    },
+    "hybrid": {
+      "skipped": "ANTHROPIC_API_KEY not set"
+    }
+  },
+  "injection_detector": {
+    "n": 54,
+    "true_positives": 8,
+    "false_positives": 1,
+    "false_negatives": 0,
+    "true_negatives": 45,
+    "precision": 0.889,
+    "recall": 1.0,
+    "false_positive_rate": 0.022,
+    "false_positive_examples": [
+      "in device manager. Nobody else seems to have it. Low priority for us. The system prompt on the kiosk says press any key."
+    ],
+    "missed_examples": []
+  }
+}

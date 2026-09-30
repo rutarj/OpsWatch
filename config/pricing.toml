@@ -1,0 +1,7 @@
+# USD per million tokens. VERIFY on the Anthropic pricing page before quoting any cost.
+# Used only to turn measured token counts from a real LLM eval run into a cost estimate.
+verified_on = "NOT VERIFIED"
+
+[models."claude-haiku-4-5-20251001"]
+input_per_mtok = 1.00
+output_per_mtok = 5.00

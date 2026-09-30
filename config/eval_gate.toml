@@ -1,0 +1,14 @@
+# CI fails if results drop below these on the held-out test set (regression guard).
+# Set a few points under the measured run in reports/EVALUATION.md, so they catch
+# real regressions without failing on noise. Never lower them just to make CI pass.
+[rules]
+min_category_accuracy = 0.55
+min_priority_accuracy = 0.38
+
+[ml]
+min_category_accuracy = 0.52
+min_priority_accuracy = 0.30
+
+[injection_detector]
+min_recall = 0.85
+max_false_positive_rate = 0.10
