@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpsWatch sign-off queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;750&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #13233A; --paper: #F5F7F9; --sheet: #FFFFFF; --line: #D5DCE3; --muted: #5B6B7D;
+    --low: #3B7A57; --medium: #B7800A; --high: #B23A2E; --focus: #2E6FD8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 15px/1.5 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 28px 32px 8px; display: flex; flex-wrap: wrap; gap: 16px; align-items: end;
+           justify-content: space-between; max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 30px; font-weight: 750; letter-spacing: -0.02em; margin: 0; }
+  h2 { font-size: 18px; font-weight: 750; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 4px 0 0; max-width: 60ch; }
+  .auth { display: flex; gap: 8px; flex-wrap: wrap; }
+  input, select, button { font: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px;
+                          background: var(--sheet); color: var(--ink); }
+  button { cursor: pointer; font-weight: 600; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  button.approve { background: var(--low); color: #fff; border-color: var(--low); }
+  button.reject { color: var(--high); border-color: var(--high); }
+  main { max-width: 1180px; margin: 0 auto; padding: 8px 32px 48px; display: grid;
+         grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } header, main { padding-left: 16px; padding-right: 16px; } }
+  .stats { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 28px; padding: 14px 0 4px;
+           border-bottom: 1px solid var(--line); }
+  .stat b { font-size: 22px; display: block; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .chain-ok { color: var(--low); } .chain-bad { color: var(--high); }
+  /* The one memorable element: each proposal is a sign-off slip with a risk-coloured edge. */
+  .slip { background: var(--sheet); border: 1px solid var(--line); border-left: 6px solid var(--medium);
+          border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; }
+  .slip.low { border-left-color: var(--low); } .slip.high { border-left-color: var(--high); }
+  .slip header { all: unset; display: flex; justify-content: space-between; gap: 12px; }
+  .slip .what { font-weight: 600; }
+  .risk { font-size: 13px; font-weight: 600; }
+  .risk.low { color: var(--low); } .risk.medium { color: var(--medium); } .risk.high { color: var(--high); }
+  .why { margin: 6px 0; }
+  .payload { background: var(--paper); border-radius: 4px; padding: 8px 10px; font-size: 13px;
+             white-space: pre-wrap; word-break: break-word; margin: 8px 0; }
+  .policy { color: var(--high); font-size: 13px; margin: 4px 0; }
+  .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .empty { color: var(--muted); padding: 18px 0; }
+  .ticket { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .ticket .meta { color: var(--muted); font-size: 13px; }
+  .suggest { font-size: 13px; margin-top: 6px; }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink);
+           color: #fff; padding: 10px 16px; border-radius: 6px; display: none; max-width: 90vw; }
+  @media (prefers-reduced-motion: no-preference) { .slip { transition: opacity .2s; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Sign-off queue</h1>
+    <p class="sub">Everything the AI agent wants to change waits here. Nothing happens until a person approves it.</p>
+  </div>
+  <div class="auth">
+    <input id="key" type="password" placeholder="API key" aria-label="API key">
+    <input id="approver" placeholder="Your approver name" aria-label="Approver name" value="service-desk-lead">
+    <button id="connect">Load queue</button>
+  </div>
+</header>
+<main>
+  <section class="stats" id="stats" aria-live="polite"><span class="empty">Enter the API key to load the queue.</span></section>
+  <section>
+    <h2>Waiting for sign-off</h2>
+    <div id="queue"></div>
+  </section>
+  <section>
+    <h2>Open tickets</h2>
+    <div id="tickets"></div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+<script>
+// Ticket text is written by end users, so it is only ever inserted as plain text (textContent), never as HTML.
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text; return n; };
+const toast = (msg) => { const t = $("toast"); t.textContent = msg; t.style.display = "block";
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = "none", 3500); };
+let KEY = "";
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { ...opts, headers: { "Content-Type": "application/json", "X-API-Key": KEY } });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || res.statusText);
+  return body;
+}
+
+const LABELS = { update_ticket: "Update ticket", add_work_note: "Add work note",
+                 resolve_ticket: "Resolve ticket", create_change: "Create change request" };
+
+async function loadStats() {
+  const [m, chain] = await Promise.all([api("/api/metrics"), api("/api/audit/verify")]);
+  const s = $("stats"); s.replaceChildren();
+  const stat = (value, label, cls) => { const d = el("div", "stat"); const b = el("b", cls, String(value));
+    d.append(b, el("span", "", label)); s.append(d); };
+  stat(m.actions_by_status.pending || 0, "waiting for sign-off");
+  stat(m.actions_by_status.blocked || 0, "blocked by policy");
+  stat(m.actions_by_status.executed || 0, "approved and applied");
+  stat((m.tickets_by_state.new || 0) + (m.tickets_by_state.in_progress || 0), "open tickets");
+  stat(chain.ok ? "Intact" : "Broken at #" + chain.first_bad_seq, `audit log (${chain.entries_checked} entries)`,
+       chain.ok ? "chain-ok" : "chain-bad");
+}
+
+async function loadQueue() {
+  const items = await api("/api/approvals?status=pending");
+  const q = $("queue"); q.replaceChildren();
+  if (!items.length) { q.append(el("p", "empty", "Nothing waiting. Proposals from the agent will appear here.")); return; }
+  for (const a of items) {
+    const slip = el("article", "slip " + a.risk);
+    const head = el("header");
+    head.append(el("span", "what", `${LABELS[a.action] || a.action} on ${a.ticket_id}`),
+                el("span", "risk " + a.risk, a.risk + " risk"));
+    slip.append(head, el("p", "why", a.rationale), el("div", "payload", JSON.stringify(a.payload, null, 2)));
+    for (const note of a.policy_notes) slip.append(el("p", "policy", note));
+    slip.append(el("span", "meta", `Proposed by ${a.proposed_by}`));
+    const row = el("div", "row");
+    const ok = el("button", "approve", "Approve"); const no = el("button", "reject", "Reject");
+    ok.onclick = () => decide(a.id, "approve"); no.onclick = () => decide(a.id, "reject");
+    row.append(ok, no); slip.append(row); q.append(slip);
+  }
+}
+
+async function loadTickets() {
+  const items = await api("/api/tickets?state=new&limit=15");
+  const box = $("tickets"); box.replaceChildren();
+  if (!items.length) { box.append(el("p", "empty", "No new tickets.")); return; }
+  for (const t of items) {
+    const d = el("div", "ticket");
+    d.append(el("div", "", `${t.id}  ${t.short_description}`),
+             el("div", "meta", `${t.caller} via ${t.source}`));
+    const btn = el("button", "", "Suggest triage");
+    const out = el("div", "suggest");
+    btn.onclick = async () => {
+      try { const s = await api(`/api/tickets/${t.id}/triage`, { method: "POST" });
+        out.textContent = `${s.category}, ${s.priority}, ${s.assignment_group} (confidence ${s.confidence})` +
+          (s.needs_human_review ? ". Needs human review." : "");
+      } catch (e) { toast(e.message); } };
+    const row = el("div", "row"); row.append(btn); d.append(row, out); box.append(d);
+  }
+}
+
+async function decide(id, verb) {
+  const approver = $("approver").value.trim();
+  const reason = verb === "reject" ? (prompt("Reason for rejecting?") || "") : "";
+  try {
+    await api(`/api/approvals/${id}/${verb}`, { method: "POST", body: JSON.stringify({ approver, reason }) });
+    toast(verb === "approve" ? `Approved and applied proposal ${id}.` : `Rejected proposal ${id}.`);
+    refresh();
+  } catch (e) { toast(e.message); }
+}
+
+async function refresh() {
+  try { await Promise.all([loadStats(), loadQueue(), loadTickets()]); }
+  catch (e) { toast(e.message); }
+}
+$("connect").onclick = () => { KEY = $("key").value; refresh(); };
+</script>
+</body>
+</html>
